@@ -103,3 +103,36 @@ header {
     box-shadow: 0 4px 12px rgba(0,0,0,0.05);
     text-align: center;
 }
+
+/* =================================== */
+/* === NEW STYLES FOR CART ITEMS === */
+/* =================================== */
+
+.cart-item {
+    display: flex;
+    justify-content: space-between; /* Pushes item name and button to opposite ends */
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.cart-item:last-child {
+    border-bottom: none; /* Removes border from the last item */
+}
+
+.remove-from-cart-btn {
+    background-color: #e0e0e0;
+    color: #333;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: bold;
+    transition: background-color 0.2s ease;
+}
+
+.remove-from-cart-btn:hover {
+    background-color: #c7c7c7;
+    color: #000;
+}

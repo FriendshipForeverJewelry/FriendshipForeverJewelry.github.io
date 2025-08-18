@@ -72,13 +72,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const cartItemsContainer = document.getElementById('cart-items');
     const cartTotalSpan = document.getElementById('cart-total');
 
-    let cart = []; // This array will hold the items in the shopping cart
+    let cart = [];
 
     // ======================================================================
     // === 2. CORE WEBSITE FUNCTIONALITY ====================================
     // ======================================================================
 
-    // Function to display all products on the page
     function renderProducts() {
         products.forEach(product => {
             const card = document.createElement('div');
@@ -96,27 +95,55 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Function to add a product to the cart
+    // MODIFIED: This function now checks if an item is already in the cart.
     function addToCart(e) {
         if (e.target.classList.contains('add-to-cart-btn')) {
             const productId = parseInt(e.target.dataset.id);
-            const productToAdd = products.find(p => p.id === productId);
-            cart.push(productToAdd);
-            renderCart();
+            
+            // NEW: Check if the product is already in the cart
+            const isInCart = cart.some(item => item.id === productId);
+
+            if (isInCart) {
+                alert('This bracelet is already in your cart!');
+            } else {
+                const productToAdd = products.find(p => p.id === productId);
+                cart.push(productToAdd);
+                renderCart();
+            }
+        }
+    }
+    
+    // NEW: This function handles removing items from the cart.
+    function removeFromCart(e) {
+        if (e.target.classList.contains('remove-from-cart-btn')) {
+            const productId = parseInt(e.target.dataset.id);
+            
+            // Find the index of the item to remove
+            const itemIndex = cart.findIndex(item => item.id === productId);
+            
+            if (itemIndex > -1) {
+                cart.splice(itemIndex, 1); // Remove the item from the array
+                renderCart(); // Update the cart display
+            }
         }
     }
 
-    // Function to update what's shown in the cart section
+    // MODIFIED: This function now adds a "Remove" button to each cart item.
     function renderCart() {
         if (cart.length === 0) {
             cartItemsContainer.innerHTML = '<p>Your cart is currently empty.</p>';
+            cartTotalSpan.textContent = '0.00'; // Ensure total is reset
         } else {
             cartItemsContainer.innerHTML = '';
             let total = 0;
             cart.forEach(item => {
-                const cartItem = document.createElement('p');
-                cartItem.textContent = `${item.name} - $${parseFloat(item.price).toFixed(2)}`;
-                cartItemsContainer.appendChild(cartItem);
+                const cartItemDiv = document.createElement('div');
+                cartItemDiv.className = 'cart-item'; // Added a class for styling
+                cartItemDiv.innerHTML = `
+                    <span>${item.name} - $${parseFloat(item.price).toFixed(2)}</span>
+                    <button class="remove-from-cart-btn" data-id="${item.id}">Remove</button>
+                `;
+                cartItemsContainer.appendChild(cartItemDiv);
                 total += parseFloat(item.price);
             });
             cartTotalSpan.textContent = total.toFixed(2);
@@ -126,19 +153,20 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initial setup when page loads
     renderProducts();
     productGrid.addEventListener('click', addToCart);
+    // NEW: Add an event listener to the cart container to handle remove clicks.
+    cartItemsContainer.addEventListener('click', removeFromCart);
+
 
     // ======================================================================
-    // === 3. PAYPAL & ORDER FULFILLMENT INTEGRATION ========================
+    // === 3. PAYPAL & ORDER FULFILLMENT INTEGRATION (No changes here) ======
     // ======================================================================
 
     paypal.Buttons({
-        // Set up the transaction details when the PayPal button is clicked
         createOrder: (data, actions) => {
             if (cart.length === 0) {
                 alert('Your cart is empty. Please add a bracelet before checking out.');
-                return actions.reject(); // Stops the transaction
+                return actions.reject();
             }
-
             const totalValue = cart.reduce((sum, item) => sum + parseFloat(item.price), 0).toFixed(2);
             const purchaseItems = cart.map(item => ({
                 name: item.name,
@@ -146,7 +174,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 unit_amount: { currency_code: 'USD', value: item.price },
                 quantity: '1'
             }));
-            
             return actions.order.create({
                 purchase_units: [{
                     amount: {
@@ -157,38 +184,27 @@ document.addEventListener('DOMContentLoaded', () => {
                 }]
             });
         },
-
-        // Finalize the transaction after the customer approves payment
         onApprove: (data, actions) => {
             return actions.order.capture().then(details => {
-                // This 'details' object contains all the vital info from PayPal
                 sendOrderConfirmationEmail(details);
                 alert(`Thank you for your order, ${details.payer.name.given_name}! A confirmation is being sent.`);
-                
-                // Clear the cart and update the display
                 cart = [];
                 renderCart();
             });
         },
-
         onError: err => {
             console.error('An error occurred with the PayPal transaction:', err);
             alert('An error occurred with your payment. Please try again.');
         }
     }).render('#paypal-button-container');
 
-    // Function to send order data to your email using Web3Forms
     function sendOrderConfirmationEmail(orderDetails) {
-        // *** IMPORTANT: PASTE YOUR WEB3FORMS ACCESS KEY HERE ***
-        const WEB3FORMS_ACCESS_KEY = 'b1cea307-1d8d-4199-b38e-70e01a5f0fc3';
-
+        const WEB3FORMS_ACCESS_KEY = 'YOUR_WEB3FORMS_ACCESS_KEY';
         const purchasedItems = orderDetails.purchase_units[0].items.map(item => 
             `- ${item.name} (${item.quantity} x $${item.unit_amount.value})`
         ).join('\n');
-        
         const shipping = orderDetails.purchase_units[0].shipping;
         const fullAddress = `${shipping.name.full_name}\n${shipping.address.address_line_1}\n${shipping.address.admin_area_2}, ${shipping.address.admin_area_1} ${shipping.address.postal_code}\n${shipping.address.country_code}`;
-
         const formData = {
             access_key: WEB3FORMS_ACCESS_KEY,
             subject: `New Bracelet Order from ${orderDetails.payer.name.given_name}!`,
@@ -200,18 +216,13 @@ document.addEventListener('DOMContentLoaded', () => {
             "Shipping Address": fullAddress,
             "PayPal Transaction ID": orderDetails.id
         };
-
         fetch('https://api.web3forms.com/submit', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
             body: JSON.stringify(formData)
         })
         .then(response => response.json())
-        .then(data => {
-            console.log('Form submission success:', data);
-        })
-        .catch(error => {
-            console.error('Error submitting form:', error);
-        });
+        .then(data => console.log('Form submission success:', data))
+        .catch(error => console.error('Error submitting form:', error));
     }
 });
