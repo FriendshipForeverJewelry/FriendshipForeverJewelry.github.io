@@ -157,10 +157,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     // ======================================================================
-    // === NEW HELPER FUNCTIONS =============================================
+    // === HELPER FUNCTIONS (WITH CORRECTION) ===============================
     // ======================================================================
 
-    // NEW: Swaps the button image between "Add to Cart" and "Added"
     function updateProductButton(productId, isAdded) {
         const buttonImage = document.querySelector(`.product-add-btn[data-id='${productId}']`);
         if (buttonImage) {
@@ -168,28 +167,26 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // NEW: Displays the temporary pop-up notification
     function showNotification(message, type) {
-        clearTimeout(notificationTimeout); // Clear any existing timeout
+        clearTimeout(notificationTimeout);
         notificationPopup.textContent = message;
-        notificationPopup.className = type; // 'success' or 'remove'
+        notificationPopup.className = type;
 
         notificationTimeout = setTimeout(() => {
             notificationPopup.className = 'hidden';
-        }, 2500); // Notification disappears after 2.5 seconds
+        }, 2500);
     }
 
-    // NEW: Shows/hides the "Back to Top" button based on scroll position
     function handleScroll() {
-        if (window.scrollY > 300) { // Show button after scrolling 300px down
+        if (window.scrollY > 300) {
             backToTopBtn.classList.remove('hidden');
         } else {
             backToTopBtn.classList.add('hidden');
         }
     }
 
-    // NEW: Smooth scrolling functionality for anchor links
-    function smoothScroll(event) {
+    // MODIFIED: This function is now ONLY for scrolling to elements within the page (like the cart).
+    function smoothScrollToElement(event) {
         event.preventDefault();
         const targetId = event.currentTarget.getAttribute('href');
         const targetElement = document.querySelector(targetId);
@@ -197,18 +194,29 @@ document.addEventListener('DOMContentLoaded', () => {
             targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
     }
+    
+    // NEW: A dedicated, more reliable function just for scrolling to the very top.
+    function scrollToTop(event) {
+        event.preventDefault();
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    }
 
     // ======================================================================
-    // === EVENT LISTENERS & INITIALIZATION =================================
+    // === EVENT LISTENERS & INITIALIZATION (WITH CORRECTION) ===============
     // ======================================================================
     
     renderProducts();
     productGrid.addEventListener('click', addToCart);
     cartItemsContainer.addEventListener('click', removeFromCart);
-    // NEW: Listeners for scroll and new buttons
     window.addEventListener('scroll', handleScroll);
-    backToTopBtn.addEventListener('click', smoothScroll);
-    goToCartBtn.addEventListener('click', smoothScroll);
+    
+    // MODIFIED: Assigning the correct function to each button.
+    backToTopBtn.addEventListener('click', scrollToTop); // Use the new, dedicated function
+    goToCartBtn.addEventListener('click', smoothScrollToElement); // Keep using the original method that works
+
 
     // ======================================================================
     // === 3. PAYPAL INTEGRATION (No changes here) ==========================
