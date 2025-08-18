@@ -163,7 +163,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function updateProductButton(productId, isAdded) {
         const buttonImage = document.querySelector(`.product-add-btn[data-id='${productId}']`);
         if (buttonImage) {
-            buttonImage.src = isAdded ? 'images/addedWide.png' : 'images/addToCartWide.png';
+            buttonImage.src = isAdded ? 'images/addedWide.webp' : 'images/addToCartWide.webp';
         }
     }
 
