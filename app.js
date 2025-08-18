@@ -96,7 +96,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
                 <h3>${product.name}</h3>
                 <p>$${parseFloat(product.price).toFixed(2)}</p>
-                <img src="images/addToCartWide.png" class="product-add-btn" alt="Add to Cart" data-id="${product.id}">
+                <img src="images/addToCartWide.webp" class="product-add-btn" alt="Add to Cart" data-id="${product.id}">
             `;
             productGrid.appendChild(card);
         });
@@ -240,7 +240,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 renderCart();
                 // NEW: Reset all "Added!" buttons back to "Add to Cart"
                 document.querySelectorAll('.product-add-btn').forEach(btn => {
-                    btn.src = 'images/addToCartWide.png';
+                    btn.src = 'images/addToCartWide.webp';
                 });
             });
         },
