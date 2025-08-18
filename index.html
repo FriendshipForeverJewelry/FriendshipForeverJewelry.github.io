@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Handmade Bracelets by Whitney</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <img src="images/logo.png" alt="Logo" id="logo">
+    </header>
+
+    <main>
+        <div id="product-grid" class="grid-container">
+            <!-- Product cards will be dynamically inserted here by JavaScript -->
+        </div>
+    </main>
+
+    <section id="cart-section">
+        <h2>Your Cart</h2>
+        <div id="cart-items">
+            <p>Your cart is currently empty.</p>
+        </div>
+        <p>Total: $<span id="cart-total">0.00</span></p>
+        
+        <!-- The PayPal buttons will be rendered inside this div -->
+        <div id="paypal-button-container"></div>
+    </section>
+
+    <!-- 
+        ======================================================================
+        *** IMPORTANT: PASTE YOUR PAYPAL CLIENT ID AFTER "client-id=" BELOW ***
+        ======================================================================
+    -->
+    <script src="https://www.paypal.com/sdk/js?client-id=YOUR_PAYPAL_CLIENT_ID&currency=USD"></script>
+    
+    <!-- This links to our JavaScript file -->
+    <script src="app.js"></script>
+</body>
+</html>
