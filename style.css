@@ -11,7 +11,16 @@ header {
 }
 
 #logo {
-    max-width: 250px;
+    /* The new maximum size, 50% larger than the old 250px. */
+    max-width: 375px; 
+    
+    /* This is the key for responsiveness. It tells the logo to take up 
+       90% of the available screen width on small devices. */
+    width: 90%; 
+
+    /* This ensures the image scales proportionally without distortion. 
+       It's good practice to always include this with a width property. */
+    height: auto; 
 }
 
 /* Product Grid Layout */
