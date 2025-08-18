@@ -18,7 +18,7 @@ body::before {
     background-repeat: repeat;
 
     /* This makes the texture subtle and not distracting */
-    opacity: 0.4; 
+    opacity: 0.9; 
 
     /* This is the key: it places the overlay behind your content */
     z-index: -1; 
