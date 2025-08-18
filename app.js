@@ -180,7 +180,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Function to send order data to your email using Web3Forms
     function sendOrderConfirmationEmail(orderDetails) {
         // *** IMPORTANT: PASTE YOUR WEB3FORMS ACCESS KEY HERE ***
-        const WEB3FORMS_ACCESS_KEY = 'YOUR_WEB3FORMS_ACCESS_KEY';
+        const WEB3FORMS_ACCESS_KEY = 'b1cea307-1d8d-4199-b38e-70e01a5f0fc3';
 
         const purchasedItems = orderDetails.purchase_units[0].items.map(item => 
             `- ${item.name} (${item.quantity} x $${item.unit_amount.value})`
