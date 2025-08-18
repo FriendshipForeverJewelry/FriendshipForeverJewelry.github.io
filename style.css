@@ -1,6 +1,6 @@
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-    margin: 20px;
+    margin: 20px 20px 100px 20px; /* Added more bottom margin for floating buttons */
     background-color: #fdfaf6;
     color: #333;
 }
@@ -11,16 +11,9 @@ header {
 }
 
 #logo {
-    /* The new maximum size, 50% larger than the old 250px. */
-    max-width: 375px; 
-    
-    /* This is the key for responsiveness. It tells the logo to take up 
-       90% of the available screen width on small devices. */
-    width: 90%; 
-
-    /* This ensures the image scales proportionally without distortion. 
-       It's good practice to always include this with a width property. */
-    height: auto; 
+    max-width: 375px;
+    width: 90%;
+    height: auto;
 }
 
 /* Product Grid Layout */
@@ -38,8 +31,10 @@ header {
     text-align: center;
     background-color: #fff;
     box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-    overflow: hidden; /* Ensures the image corners are rounded */
+    overflow: hidden;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
+    display: flex; /* Helps align content vertically */
+    flex-direction: column;
 }
 
 .product-card:hover {
@@ -82,22 +77,16 @@ header {
     font-weight: bold;
 }
 
-/* "Add to Cart" Button Style */
-.add-to-cart-btn {
-    background-color: #E84A5F;
-    color: white;
-    border: none;
-    padding: 12px 24px;
-    margin-bottom: 20px;
-    border-radius: 50px;
+/* NEW: Styles for the image-based "Add to Cart" button */
+.product-add-btn {
+    width: 80%;
+    height: auto;
     cursor: pointer;
-    font-weight: bold;
-    font-size: 16px;
-    transition: background-color 0.3s ease, transform 0.2s ease;
+    margin: auto auto 20px auto; /* Pushes button to bottom and centers it */
+    transition: transform 0.2s ease;
 }
 
-.add-to-cart-btn:hover {
-    background-color: #D93A4F;
+.product-add-btn:hover {
     transform: scale(1.05);
 }
 
@@ -113,20 +102,17 @@ header {
     text-align: center;
 }
 
-/* =================================== */
-/* === NEW STYLES FOR CART ITEMS === */
-/* =================================== */
-
+/* Styles for individual items within the cart */
 .cart-item {
     display: flex;
-    justify-content: space-between; /* Pushes item name and button to opposite ends */
+    justify-content: space-between;
     align-items: center;
     padding: 8px 0;
     border-bottom: 1px solid #f0f0f0;
 }
 
 .cart-item:last-child {
-    border-bottom: none; /* Removes border from the last item */
+    border-bottom: none;
 }
 
 .remove-from-cart-btn {
@@ -144,4 +130,68 @@ header {
 .remove-from-cart-btn:hover {
     background-color: #c7c7c7;
     color: #000;
+}
+
+/* =================================== */
+/* === NEW STYLES ADDED BELOW      === */
+/* =================================== */
+
+/* Styles for the Notification Pop-up */
+#notification-popup {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 15px 30px;
+    border-radius: 50px;
+    color: white;
+    font-weight: bold;
+    z-index: 1000;
+    opacity: 1;
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+#notification-popup.success {
+    background-color: #28a745; /* Green for success */
+}
+
+#notification-popup.remove {
+    background-color: #dc3545; /* Red for removal */
+}
+
+#notification-popup.hidden {
+    opacity: 0;
+    transform: translate(-50%, -50px);
+}
+
+/* Styles for the Floating Navigation Buttons */
+.floating-btn {
+    position: fixed;
+    bottom: 20px;
+    padding: 12px 18px;
+    background-color: #E84A5F;
+    color: white;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: bold;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    z-index: 999;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.floating-btn:hover {
+    transform: scale(1.1);
+}
+
+#go-to-cart-btn {
+    right: 20px;
+}
+
+#back-to-top-btn {
+    left: 20px;
+}
+
+#back-to-top-btn.hidden {
+    opacity: 0;
+    pointer-events: none; /* Prevents clicking when hidden */
 }

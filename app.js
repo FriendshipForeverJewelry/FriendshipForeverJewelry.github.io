@@ -68,16 +68,23 @@ document.addEventListener('DOMContentLoaded', () => {
         // ... Add all 60+ of your bracelets here following this format
     ];
     
+    // --- DOM ELEMENT REFERENCES ---
     const productGrid = document.getElementById('product-grid');
     const cartItemsContainer = document.getElementById('cart-items');
     const cartTotalSpan = document.getElementById('cart-total');
+    // NEW: References for new elements
+    const notificationPopup = document.getElementById('notification-popup');
+    const backToTopBtn = document.getElementById('back-to-top-btn');
+    const goToCartBtn = document.getElementById('go-to-cart-btn');
 
     let cart = [];
+    let notificationTimeout;
 
     // ======================================================================
     // === 2. CORE WEBSITE FUNCTIONALITY ====================================
     // ======================================================================
 
+    // MODIFIED: Now renders an <img> instead of a <button> for adding to cart
     function renderProducts() {
         products.forEach(product => {
             const card = document.createElement('div');
@@ -89,18 +96,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
                 <h3>${product.name}</h3>
                 <p>$${parseFloat(product.price).toFixed(2)}</p>
-                <button class="add-to-cart-btn" data-id="${product.id}">Add to Cart</button>
+                <img src="images/addToCartWide.png" class="product-add-btn" alt="Add to Cart" data-id="${product.id}">
             `;
             productGrid.appendChild(card);
         });
     }
 
-    // MODIFIED: This function now checks if an item is already in the cart.
+    // MODIFIED: Now calls notification and button update functions
     function addToCart(e) {
-        if (e.target.classList.contains('add-to-cart-btn')) {
+        if (e.target.classList.contains('product-add-btn')) {
             const productId = parseInt(e.target.dataset.id);
-            
-            // NEW: Check if the product is already in the cart
             const isInCart = cart.some(item => item.id === productId);
 
             if (isInCart) {
@@ -109,36 +114,37 @@ document.addEventListener('DOMContentLoaded', () => {
                 const productToAdd = products.find(p => p.id === productId);
                 cart.push(productToAdd);
                 renderCart();
+                updateProductButton(productId, true); // NEW: Update button to "Added"
+                showNotification("Added to Cart!", "success"); // NEW: Show notification
             }
         }
     }
     
-    // NEW: This function handles removing items from the cart.
+    // MODIFIED: Now calls notification and button update functions
     function removeFromCart(e) {
         if (e.target.classList.contains('remove-from-cart-btn')) {
             const productId = parseInt(e.target.dataset.id);
-            
-            // Find the index of the item to remove
             const itemIndex = cart.findIndex(item => item.id === productId);
             
             if (itemIndex > -1) {
-                cart.splice(itemIndex, 1); // Remove the item from the array
-                renderCart(); // Update the cart display
+                cart.splice(itemIndex, 1);
+                renderCart();
+                updateProductButton(productId, false); // NEW: Update button to "Add to Cart"
+                showNotification("Removed from Cart!", "remove"); // NEW: Show notification
             }
         }
     }
 
-    // MODIFIED: This function now adds a "Remove" button to each cart item.
     function renderCart() {
         if (cart.length === 0) {
             cartItemsContainer.innerHTML = '<p>Your cart is currently empty.</p>';
-            cartTotalSpan.textContent = '0.00'; // Ensure total is reset
+            cartTotalSpan.textContent = '0.00';
         } else {
             cartItemsContainer.innerHTML = '';
             let total = 0;
             cart.forEach(item => {
                 const cartItemDiv = document.createElement('div');
-                cartItemDiv.className = 'cart-item'; // Added a class for styling
+                cartItemDiv.className = 'cart-item';
                 cartItemDiv.innerHTML = `
                     <span>${item.name} - $${parseFloat(item.price).toFixed(2)}</span>
                     <button class="remove-from-cart-btn" data-id="${item.id}">Remove</button>
@@ -150,15 +156,62 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
-    // Initial setup when page loads
-    renderProducts();
-    productGrid.addEventListener('click', addToCart);
-    // NEW: Add an event listener to the cart container to handle remove clicks.
-    cartItemsContainer.addEventListener('click', removeFromCart);
+    // ======================================================================
+    // === NEW HELPER FUNCTIONS =============================================
+    // ======================================================================
 
+    // NEW: Swaps the button image between "Add to Cart" and "Added"
+    function updateProductButton(productId, isAdded) {
+        const buttonImage = document.querySelector(`.product-add-btn[data-id='${productId}']`);
+        if (buttonImage) {
+            buttonImage.src = isAdded ? 'images/addedWide.png' : 'images/addToCartWide.png';
+        }
+    }
+
+    // NEW: Displays the temporary pop-up notification
+    function showNotification(message, type) {
+        clearTimeout(notificationTimeout); // Clear any existing timeout
+        notificationPopup.textContent = message;
+        notificationPopup.className = type; // 'success' or 'remove'
+
+        notificationTimeout = setTimeout(() => {
+            notificationPopup.className = 'hidden';
+        }, 2500); // Notification disappears after 2.5 seconds
+    }
+
+    // NEW: Shows/hides the "Back to Top" button based on scroll position
+    function handleScroll() {
+        if (window.scrollY > 300) { // Show button after scrolling 300px down
+            backToTopBtn.classList.remove('hidden');
+        } else {
+            backToTopBtn.classList.add('hidden');
+        }
+    }
+
+    // NEW: Smooth scrolling functionality for anchor links
+    function smoothScroll(event) {
+        event.preventDefault();
+        const targetId = event.currentTarget.getAttribute('href');
+        const targetElement = document.querySelector(targetId);
+        if(targetElement){
+            targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    }
 
     // ======================================================================
-    // === 3. PAYPAL & ORDER FULFILLMENT INTEGRATION (No changes here) ======
+    // === EVENT LISTENERS & INITIALIZATION =================================
+    // ======================================================================
+    
+    renderProducts();
+    productGrid.addEventListener('click', addToCart);
+    cartItemsContainer.addEventListener('click', removeFromCart);
+    // NEW: Listeners for scroll and new buttons
+    window.addEventListener('scroll', handleScroll);
+    backToTopBtn.addEventListener('click', smoothScroll);
+    goToCartBtn.addEventListener('click', smoothScroll);
+
+    // ======================================================================
+    // === 3. PAYPAL INTEGRATION (No changes here) ==========================
     // ======================================================================
 
     paypal.Buttons({
@@ -168,21 +221,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 return actions.reject();
             }
             const totalValue = cart.reduce((sum, item) => sum + parseFloat(item.price), 0).toFixed(2);
-            const purchaseItems = cart.map(item => ({
-                name: item.name,
-                sku: item.sku,
-                unit_amount: { currency_code: 'USD', value: item.price },
-                quantity: '1'
-            }));
-            return actions.order.create({
-                purchase_units: [{
-                    amount: {
-                        value: totalValue,
-                        breakdown: { item_total: { currency_code: 'USD', value: totalValue } }
-                    },
-                    items: purchaseItems
-                }]
-            });
+            const purchaseItems = cart.map(item => ({ name: item.name, sku: item.sku, unit_amount: { currency_code: 'USD', value: item.price }, quantity: '1' }));
+            return actions.order.create({ purchase_units: [{ amount: { value: totalValue, breakdown: { item_total: { currency_code: 'USD', value: totalValue } } }, items: purchaseItems }] });
         },
         onApprove: (data, actions) => {
             return actions.order.capture().then(details => {
@@ -190,6 +230,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 alert(`Thank you for your order, ${details.payer.name.given_name}! A confirmation is being sent.`);
                 cart = [];
                 renderCart();
+                // NEW: Reset all "Added!" buttons back to "Add to Cart"
+                document.querySelectorAll('.product-add-btn').forEach(btn => {
+                    btn.src = 'images/addToCartWide.png';
+                });
             });
         },
         onError: err => {
@@ -199,10 +243,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }).render('#paypal-button-container');
 
     function sendOrderConfirmationEmail(orderDetails) {
-        const WEB3FORMS_ACCESS_KEY = 'YOUR_WEB3FORMS_ACCESS_KEY';
-        const purchasedItems = orderDetails.purchase_units[0].items.map(item => 
-            `- ${item.name} (${item.quantity} x $${item.unit_amount.value})`
-        ).join('\n');
+        const WEB3FORMS_ACCESS_KEY = 'b1cea307-1d8d-4199-b38e-70e01a5f0fc3';
+        const purchasedItems = orderDetails.purchase_units[0].items.map(item => `- ${item.name} (${item.quantity} x $${item.unit_amount.value})`).join('\n');
         const shipping = orderDetails.purchase_units[0].shipping;
         const fullAddress = `${shipping.name.full_name}\n${shipping.address.address_line_1}\n${shipping.address.admin_area_2}, ${shipping.address.admin_area_1} ${shipping.address.postal_code}\n${shipping.address.country_code}`;
         const formData = {
