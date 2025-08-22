@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Add each bracelet as a new object in this array.
     // Make sure 'id' is unique and image names match your files.
     const products = [
-        { id: 1, name: 'bracelet 1', price: '2.00', sku: 'B001' },
+        { id: 1, name: 'cute fashionable rainbow bracelet - pastel', price: '2.00', sku: 'B001' },
         { id: 2, name: 'bracelet 2', price: '2.00', sku: 'B002' },
         { id: 3, name: 'bracelet 3', price: '2.00', sku: 'B003' },
         { id: 4, name: 'bracelet 4', price: '2.00', sku: 'B004' },
