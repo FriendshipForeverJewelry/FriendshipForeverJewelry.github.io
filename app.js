@@ -7,9 +7,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // Make sure 'id' is unique and image names match your files.
     const products = [
         { id: 1, name: 'cute fashionable rainbow bracelet - pastel', price: '2.00', sku: 'B001' },
-        { id: 2, name: 'bracelet 2', price: '2.00', sku: 'B002' },
-        { id: 3, name: 'bracelet 3', price: '2.00', sku: 'B003' },
-        { id: 4, name: 'bracelet 4', price: '2.00', sku: 'B004' },
+        { id: 2, name: 'cute blue & white bracelet - pastel', price: '2.00', sku: 'B002' },
+        { id: 3, name: 'cute donut pink & black bracelet - pastel', price: '2.00', sku: 'B003' },
+        { id: 4, name: 'cute charm bracelet w/pastel colors', price: '2.00', sku: 'B004' },
         { id: 5, name: 'bracelet 5', price: '2.00', sku: 'B005' },
         { id: 6, name: 'bracelet 6', price: '2.00', sku: 'B006' },
         { id: 7, name: 'bracelet 7', price: '2.00', sku: 'B007' },
